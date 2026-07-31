@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MotoServe — Bike Service Booking</title>
+  <meta name="description" content="Book your bike service online — fast, easy, and reliable. Choose from general service, oil change, or repair." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent:     #f97316;
+      --accent-2:   #fb923c;
+      --bg:         #0a0a0f;
+      --surface:    #111118;
+      --card:       rgba(255,255,255,0.045);
+      --border:     rgba(255,255,255,0.08);
+      --text:       #f1f1f1;
+      --muted:      #9ca3af;
+      --radius:     16px;
+      --shadow:     0 24px 64px rgba(0,0,0,0.6);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* ── Animated background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(249,115,22,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 110%, rgba(251,146,60,0.12) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Floating orbs ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.25;
+      pointer-events: none;
+      animation: drift 12s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+    .orb-1 { width: 420px; height: 420px; background: #f97316; top: -120px; left: -80px; animation-delay: 0s; }
+    .orb-2 { width: 320px; height: 320px; background: #fb923c; bottom: -100px; right: -60px; animation-delay: -6s; }
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(30px, 20px) scale(1.08); }
+    }
+
+    /* ── Header ── */
+    header {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      padding: 24px 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      background: rgba(10,10,15,0.7);
+    }
+    .logo-icon {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 20px rgba(249,115,22,0.4);
+    }
+    .brand { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; }
+    .brand span { color: var(--accent); }
+    .nav-link {
+      margin-left: auto;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px 18px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: all 0.25s;
+    }
+    .nav-link:hover { color: var(--text); border-color: var(--accent); background: rgba(249,115,22,0.08); }
+
+    /* ── Hero text ── */
+    .hero {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 64px 24px 0;
+      max-width: 620px;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(249,115,22,0.12);
+      border: 1px solid rgba(249,115,22,0.3);
+      color: var(--accent-2);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+    }
+    .badge::before { content: '⚡'; }
+    h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.12;
+      margin-bottom: 16px;
+    }
+    h1 .gradient {
+      background: linear-gradient(135deg, var(--accent), #fde68a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .subtitle {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+
+    /* ── Card ── */
+    .card {
+      position: relative;
+      z-index: 10;
+      width: min(520px, calc(100% - 48px));
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+      margin-bottom: 60px;
+      animation: slideUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(249,115,22,0.3), transparent 50%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* ── Form elements ── */
+    .form-grid { display: grid; gap: 20px; }
+
+    .field { display: flex; flex-direction: column; gap: 7px; }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      font-size: 16px;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    select {
+      width: 100%;
+      padding: 13px 14px 13px 40px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+      -webkit-appearance: none;
+    }
+    input::placeholder { color: #4b5563; }
+    input[type="text"]:focus,
+    input[type="tel"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      background: rgba(249,115,22,0.07);
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.15);
+    }
+    select { cursor: pointer; }
+    select option { background: #1a1a22; color: var(--text); }
+
+    /* service cards */
+    .service-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .service-opt { display: none; }
+    .service-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .service-label .svc-icon { font-size: 24px; }
+    .service-opt:checked + .service-label {
+      border-color: var(--accent);
+      background: rgba(249,115,22,0.12);
+      color: var(--accent-2);
+    }
+    .service-label:hover { border-color: rgba(249,115,22,0.4); color: var(--text); }
+
+    /* ── Submit button ── */
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      margin-top: 6px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+      box-shadow: 0 8px 24px rgba(249,115,22,0.35);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-submit::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(249,115,22,0.5); filter: brightness(1.08); }
+    .btn-submit:hover::after { opacity: 1; }
+    .btn-submit:active { transform: translateY(0); }
+
+    /* ── Stats bar ── */
+    .stats {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 0 24px 56px;
+    }
+    .stat {
+      text-align: center;
+      animation: slideUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .stat:nth-child(2) { animation-delay: 0.1s; }
+    .stat:nth-child(3) { animation-delay: 0.2s; }
+    .stat-num { font-size: 1.6rem; font-weight: 800; color: var(--accent); }
+    .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ── Footer ── */
+    footer {
+      position: relative;
+      z-index: 10;
+      padding: 20px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-icon">🏍️</div>
+    <div class="brand">Moto<span>Serve</span></div>
+    <a href="view.php" class="nav-link" id="view-bookings-link">View Bookings →</a>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="badge">Trusted Service Center</div>
+    <h1>Book Your Bike<br /><span class="gradient">Service Today</span></h1>
+    <p class="subtitle">Fast, transparent and professional bike servicing.<br />Fill in your details and we'll handle the rest.</p>
+  </section>
+
+  <!-- Booking Form Card -->
+  <div class="card">
+    <form id="booking-form" action="submit.php" method="post" novalidate>
+      <div class="form-grid">
+
+        <!-- Name -->
+        <div class="field">
+          <label for="name">Full Name</label>
+          <div class="input-wrap">
+            <span class="input-icon">👤</span>
+            <input type="text" id="name" name="name" placeholder="e.g. Ravi Kumar" required autocomplete="name" />
+          </div>
+        </div>
+
+        <!-- Bike -->
+        <div class="field">
+          <label for="bike">Bike Model</label>
+          <div class="input-wrap">
+            <span class="input-icon">🏍️</span>
+            <input type="text" id="bike" name="bike" placeholder="e.g. Royal Enfield Classic 350" required />
+          </div>
+        </div>
+
+        <!-- Service -->
+        <div class="field">
+          <label>Select Service</label>
+          <div class="service-grid">
+            <input class="service-opt" type="radio" name="service" id="svc-general" value="General Service" checked />
+            <label class="service-label" for="svc-general">
+              <span class="svc-icon">🔧</span>General Service
+            </label>
+
+            <input class="service-opt" type="radio" name="service" id="svc-oil" value="Oil Change" />
+            <label class="service-label" for="svc-oil">
+              <span class="svc-icon">🛢️</span>Oil Change
+            </label>
+
+            <input class="service-opt" type="radio" name="service" id="svc-repair" value="Repair" />
+            <label class="service-label" for="svc-repair">
+              <span class="svc-icon">⚙️</span>Repair
+            </label>
+          </div>
+        </div>
+
+        <!-- Mobile -->
+        <div class="field">
+          <label for="mobile">Mobile Number</label>
+          <div class="input-wrap">
+            <span class="input-icon">📱</span>
+            <input type="tel" id="mobile" name="mobile" placeholder="10-digit number" required maxlength="10" pattern="[0-9]{10}" />
+          </div>
+        </div>
+
+        <div class="divider">Ready to book?</div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-submit" id="book-now-btn">🚀 Book My Service</button>
+
+      </div>
+    </form>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">1,200+</div>
+      <div class="stat-label">Bikes Serviced</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">4.9 ★</div>
+      <div class="stat-label">Customer Rating</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">24 hr</div>
+      <div class="stat-label">Avg. Turnaround</div>
+    </div>
+  </div>
+
+  <footer>© 2026 MotoServe · All rights reserved</footer>
+
+  <script>
+    // Client-side validation with shake animation
+    const form = document.getElementById('booking-form');
+    const btn  = document.getElementById('book-now-btn');
+
+    form.addEventListener('submit', function(e) {
+      const name   = document.getElementById('name').value.trim();
+      const bike   = document.getElementById('bike').value.trim();
+      const mobile = document.getElementById('mobile').value.trim();
+      const service = document.querySelector('input[name="service"]:checked');
+
+      if (!name || !bike || !mobile || !service) {
+        e.preventDefault();
+        shakeCard();
+        return;
+      }
+      if (!/^[0-9]{10}$/.test(mobile)) {
+        e.preventDefault();
+        document.getElementById('mobile').style.borderColor = '#ef4444';
+        shakeCard();
+        return;
+      }
+
+      btn.textContent = '⏳ Booking...';
+      btn.disabled = true;
+    });
+
+    function shakeCard() {
+      const card = document.querySelector('.card');
+      card.style.animation = 'none';
+      card.offsetHeight; // reflow
+      card.style.animation = 'shake 0.4s ease';
+    }
+
+    // Add shake keyframes dynamically
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%,100% { transform: translateX(0); }
+        20%      { transform: translateX(-8px); }
+        40%      { transform: translateX(8px); }
+        60%      { transform: translateX(-6px); }
+        80%      { transform: translateX(6px); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Reset mobile border on input
+    document.getElementById('mobile').addEventListener('input', function() {
+      this.style.borderColor = '';
+    });
+  </script>
+</body>
+</html>
